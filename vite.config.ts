@@ -7,7 +7,7 @@ import { viteSingleFile } from "vite-plugin-singlefile";
 export default defineConfig(({mode}) => {
   const env = loadEnv(mode, '.', '');
   return {
-    base: '/heart/',
+    base: '/Heart/',
     plugins: [react(), tailwindcss(), viteSingleFile()],
     // Do NOT embed secret keys into the client bundle. Read secrets server-side
     // and proxy API calls from the client to your backend (example below).
