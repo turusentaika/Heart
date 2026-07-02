@@ -6,10 +6,13 @@ import * as THREE from 'three';
 const TextParticle = ({ position, rotation, text }: { position: [number, number, number], rotation: [number, number, number], text: string }) => {
   const textRef = useRef<THREE.Group>(null!);
   
+  // Varmistetaan tekstin skaalaus puhelimella
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const textSize = isMobile ? 0.04 : 0.08; // Puolitetaan tekstin koko puhelimella!
+
   useFrame((state) => {
     const time = state.clock.getElapsedTime();
     if (textRef.current) {
-        // Subtle local floating
         textRef.current.position.y += Math.sin(time + position[0]) * 0.001;
     }
   });
@@ -18,7 +21,7 @@ const TextParticle = ({ position, rotation, text }: { position: [number, number,
     <group ref={textRef} position={position} rotation={rotation}>
       <Text
         font="https://fonts.gstatic.com/s/firacode/v10/u4qEypQMoY8idkw1vgdf2Gf6eXAOawnc.woff"
-        fontSize={0.08}
+        fontSize={textSize} // <-- Käytetään dynaamista kokoa tässä
         color="#ff4d6d"
         anchorX="center"
         anchorY="middle"
@@ -36,7 +39,9 @@ const HeartCloud = () => {
   const particles = useMemo(() => {
     const temp = [];
     const count = 250; // Optimized count
-    const text = "i love you";
+    // Lyhyempi teksti puhelimella estää puuroontumisen
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const text = isMobile ? "❤️" : "i love you";
     
     for (let i = 0; i < count; i++) {
         const t = Math.random() * Math.PI * 2;
@@ -73,9 +78,19 @@ const HeartCloud = () => {
 };
 
 export default function HeartScene({ active }: { active: boolean }) {
+  // Lasketaan dynaaminen fov ja kameran etäisyys ruudun leveyden mukaan
+  // Jos ruutu on kapea (puhelin), suurennetaan fov:ia, jotta sydän mahtuu muuttumattomana ruutuun
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+  const cameraFov = isMobile ? 65 : 45;       // Korkeampi FOV puhelimella estää litistymisen
+  const cameraZ = isMobile ? 7.5 : 5;           // Siirretään kameraa hieman kauemmas puhelimella
+
   return (
     <div className="absolute inset-0 z-0">
-      <Canvas camera={{ position: [0, 0, 5], fov: 45 }}>
+      {/* Päivitetään kamera käyttämään dynaamisia arvoja */}
+      <Canvas 
+        key={isMobile ? 'mobile' : 'desktop'} // Pakottaa Canvaksen päivittymään jos ruutua käännetään
+        camera={{ position: [0, 0, cameraZ], fov: cameraFov }}
+      >
         <ambientLight intensity={0.5} />
         <pointLight position={[10, 10, 10]} intensity={1} color="#ff4d6d" />
         

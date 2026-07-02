@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { motion } from 'motion/react'; // Tuodaan motion mukaan sulavuutta varten
 import theme from '../theme';
 
 const lines = [
@@ -44,14 +45,20 @@ export default function IntroScene({ onUnlock }: { onUnlock: () => void }) {
     event.preventDefault();
     if (password.trim().toLowerCase() === correctPassword) {
       setStatus('granted');
-      window.setTimeout(onUnlock, 800);
+      window.setTimeout(onUnlock, 400); // Lyhennetty hieman jotta siirtymä alkaa sulavammin
     } else {
       setStatus('denied');
     }
   };
 
   return (
-    <div
+    // Muutettu tavallinen div -> motion.div ja lisätty fade-animaatiot
+    <motion.div
+      key="intro-scene"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, scale: 0.98 }}
+      transition={{ duration: 0.5 }}
       className="absolute inset-0 flex items-center justify-center px-4"
       style={{ background: theme.bg }}
     >
@@ -72,7 +79,12 @@ export default function IntroScene({ onUnlock }: { onUnlock: () => void }) {
           </div>
 
           {showInput && (
-            <div className="pt-8 flex flex-col items-start gap-6">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+              className="pt-8 flex flex-col items-start gap-6"
+            >
               <p className="text-white/40 italic">{">"} Enter password to verify your identity.</p>
 
               <div className="flex items-center gap-3 w-full">
@@ -100,10 +112,10 @@ export default function IntroScene({ onUnlock }: { onUnlock: () => void }) {
               {status === 'denied' && (
                 <div className="text-sm text-rose-300">ACCESS DENIED. Try again.</div>
               )}
-            </div>
+            </motion.div>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
