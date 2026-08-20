@@ -7,7 +7,7 @@ const lines = [
   { prefix: '[access]', text: 'Please enter password to unlock the next scene.' },
 ];
 
-const correctPassword = 'hungu';
+const correctPassword = '';
 
 export default function IntroScene({ onUnlock }: { onUnlock: () => void }) {
   const [completedLines, setCompletedLines] = useState<string[]>([]);
